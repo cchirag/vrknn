@@ -42,12 +42,12 @@ const accuracy_knn = knn.evaluate({
   testing_labels: testing_labels,
 });
 
-console.log("Accuracy of KNN: ", accuracy_knn);
-console.log("Time taken to predict KNN: ", knn.time_taken_to_predict, "ms");
-
 const vrknn = new VRKNN({
   k: 3,
   radius_delta: 0.1,
+  hash_function(data_point) {
+    return Math.floor(data_point.coordinates[0]);
+  },
 });
 
 vrknn.fit({
@@ -63,13 +63,15 @@ const accuracy_vrknn = vrknn.evaluate({
   testing_labels: testing_labels,
 });
 
-console.log("Accuracy of VRKNN: ", accuracy_vrknn);
-console.log("Time taken to predict VRKNN: ", vrknn.time_taken_to_predict, "ms");
 console.log("Total Iris Dataset: ", iris_data.length);
 console.log("Length of training data of Iris Dataset: ", training_data.length);
 console.log("Length of testing data of Iris Dataset: ", testing_data.length);
+console.log("Accuracy of KNN: ", accuracy_knn);
+console.log("Time taken to predict KNN: ", knn.time_taken_to_predict, "ms");
+console.log("Accuracy of VRKNN: ", accuracy_vrknn);
+console.log("Time taken to predict VRKNN: ", vrknn.time_taken_to_predict, "ms");
 
-console.log("\nBreast Cancer Wisconsin (Diagnostic) Data Set Predictions");
+// Breast Cancer Dataset
 interface BreastCancerDataPoint {
   radius_mean: number;
   texture_mean: number;
@@ -110,6 +112,9 @@ const accuracy_knn_breast_cancer = knn_breast_cancer.evaluate({
 const vrknn_breast_cancer = new VRKNN({
   k: 3,
   radius_delta: 0.1,
+  hash_function(data_point) {
+    return Math.floor(data_point.coordinates[0]);
+  },
 });
 
 vrknn_breast_cancer.fit({
@@ -124,6 +129,7 @@ const accuracy_vrknn_breast_cancer = vrknn_breast_cancer.evaluate({
   predictions: vr_predictions_breast_cancer,
   testing_labels: testing_labels_breast_cancer,
 });
+console.log("\nBreast Cancer Wisconsin (Diagnostic) Data Set Predictions");
 console.log("Total Breast Cancer Dataset: ", breast_cancer_data.length);
 console.log("Accuracy of KNN: ", accuracy_knn_breast_cancer);
 console.log(

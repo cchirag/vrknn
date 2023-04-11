@@ -8,17 +8,18 @@ interface Bucket {
 class HashTable {
   private data: TrainingDataPoint[] = [];
   private buckets: Bucket[] = [];
+  hash_function: (data_point: TrainingDataPoint) => number;
 
-  private hash_function(params: { data_point: TrainingDataPoint }): number {
-    const { data_point } = params;
-    const { coordinates } = data_point;
-    const hash = Math.floor(coordinates[0]);
-    return hash;
+  constructor(params: {
+    hash_function: (data_point: TrainingDataPoint) => number;
+  }) {
+    const { hash_function } = params;
+    this.hash_function = hash_function;
   }
 
   public insert(params: { data_point: TrainingDataPoint }): void {
     const { data_point } = params;
-    const hash = this.hash_function({ data_point });
+    const hash = this.hash_function(data_point);
     const bucket = this.buckets.find((bucket) => bucket.id === hash);
     // Sort the data points in the bucket by their y coordinate
     if (bucket) {
@@ -59,15 +60,22 @@ class HashTable {
 }
 
 export class VRKNN {
-  private hash_table: HashTable = new HashTable();
+  private hash_function: (data_point: TrainingDataPoint) => number;
+  private hash_table: HashTable;
   private training_data: TrainingDataPoint[] = [];
   private k: number;
   private radius_delta: number;
   public time_taken_to_predict: number = 0;
 
-  constructor(params: { k: number; radius_delta: number }) {
+  constructor(params: {
+    k: number;
+    radius_delta: number;
+    hash_function: (data_point: TrainingDataPoint) => number;
+  }) {
     this.k = params.k;
     this.radius_delta = params.radius_delta;
+    this.hash_function = params.hash_function;
+    this.hash_table = new HashTable({ hash_function: this.hash_function });
   }
 
   public fit(params: { training_data: TrainingDataPoint[] }): void {
