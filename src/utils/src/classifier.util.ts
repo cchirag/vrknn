@@ -22,6 +22,5 @@ export const best_of_all = (params: { labels: string[] }): string => {
   const sorted_labels = Object.entries(label_counts).sort(
     (a, b) => b[1] - a[1]
   );
-  console.log(sorted_labels);
   return sorted_labels[0][0];
 };

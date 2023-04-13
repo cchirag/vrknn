@@ -111,7 +111,7 @@ export class VRKNN {
     testing_data.forEach((test_datapoint) => {
       const nearest_neighbors: TrainingDataPoint[][] = [];
       const distances: [string, number][] = [];
-      while (nearest_neighbors.length < this.k) {
+      while (nearest_neighbors.length <= this.k) {
         testing_data.forEach((test_datapoint) => {
           var x_min = test_datapoint.coordinates[0] - this.radius_delta;
           var x_max = test_datapoint.coordinates[0] + this.radius_delta;
