@@ -1,6 +1,7 @@
 import { Dataset } from "./dataset";
 import iris_dataset from "./data/iris.json";
 import breast_cancer_dataset from "./data/breast_cancer.json";
+import dry_beans_dataset from "./data/dry_beans.json";
 import { KNN, VRKNN } from "./lib";
 
 // Iris Dataset
