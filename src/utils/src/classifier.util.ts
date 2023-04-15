@@ -15,7 +15,7 @@ export const distance = (params: {
 export const best_of_all = (params: { labels: string[] }): string => {
   const { labels } = params;
   const label_counts: { [key: string]: number } = {};
-  labels.forEach((label) => {
+  labels.forEach((label, index) => {
     if (label_counts[label]) label_counts[label]++;
     else label_counts[label] = 1;
   });

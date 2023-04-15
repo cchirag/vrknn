@@ -1,38 +1,48 @@
 import { best_of_all, distance } from "../../utils";
 import { TestDatapoint, TrainingDataPoint } from "../../models";
-
 interface Bucket {
   id: number;
   data: TrainingDataPoint[];
 }
 class HashTable {
-  private data: TrainingDataPoint[] = [];
   private buckets: Bucket[] = [];
-  hash_function: (data_point: TrainingDataPoint) => number;
+  private bucket_size: number = 0;
 
-  constructor(params: {
-    hash_function: (data_point: TrainingDataPoint) => number;
-  }) {
-    const { hash_function } = params;
-    this.hash_function = hash_function;
+  public create_buckets = (params: { data: TrainingDataPoint[] }): void => {
+    const { data } = params;
+    const largest_x_coordinate = Math.max(
+      ...data.map((data_point) => data_point.coordinates[0])
+    );
+    const smallest_x_coordinate = Math.min(
+      ...data.map((data_point) => data_point.coordinates[0])
+    );
+    const range_of_x_coordinates = largest_x_coordinate - smallest_x_coordinate;
+    const number_of_buckets = Math.ceil(1 + 3.322 * Math.log10(data.length));
+    this.bucket_size = range_of_x_coordinates / number_of_buckets;
+    for (let i = 0; i < number_of_buckets; i++) {
+      const new_bucket: Bucket = {
+        id: smallest_x_coordinate + i * this.bucket_size,
+        data: [],
+      };
+      this.buckets.push(new_bucket);
+    }
+  };
+
+  private hash_function(data_point: TrainingDataPoint): number {
+    var bucket_id: number = 0;
+    const filteredBuckets = this.buckets.filter(
+      (bucket) => bucket.id <= data_point.coordinates[0]
+    );
+    bucket_id = filteredBuckets[filteredBuckets.length - 1].id;
+    return bucket_id;
   }
 
   public insert(params: { data_point: TrainingDataPoint }): void {
     const { data_point } = params;
     const hash = this.hash_function(data_point);
     const bucket = this.buckets.find((bucket) => bucket.id === hash);
-    // Sort the data points in the bucket by their y coordinate
-    if (bucket) {
-      bucket.data.push(data_point);
-      bucket.data.sort((a, b) => a.coordinates[1] - b.coordinates[1]);
-      return;
-    }
-    // Create a new bucket if it doesn't exist
-    const new_bucket: Bucket = {
-      id: hash,
-      data: [data_point],
-    };
-    this.buckets.push(new_bucket);
+    bucket!.data.push(data_point);
+    bucket!.data.sort((a, b) => a.coordinates[1] - b.coordinates[1]);
   }
 
   public data_points_in_range(params: {
@@ -43,7 +53,7 @@ class HashTable {
   }): TrainingDataPoint[] {
     const { max_x, min_x, max_y, min_y } = params;
     const data_points_in_range: TrainingDataPoint[] = [];
-    this.buckets.forEach((bucket) => {
+    this.buckets.forEach((bucket, index) => {
       if (bucket.id >= min_x && bucket.id <= max_x) {
         bucket.data.forEach((data_point) => {
           if (
@@ -60,22 +70,15 @@ class HashTable {
 }
 
 export class VRKNN {
-  private hash_function: (data_point: TrainingDataPoint) => number;
-  private hash_table: HashTable;
+  private hash_table: HashTable = new HashTable();
   private training_data: TrainingDataPoint[] = [];
   private k: number;
   private radius_delta: number;
   public time_taken_to_predict: number = 0;
 
-  constructor(params: {
-    k: number;
-    radius_delta: number;
-    hash_function: (data_point: TrainingDataPoint) => number;
-  }) {
+  constructor(params: { k: number; radius_delta: number }) {
     this.k = params.k;
     this.radius_delta = params.radius_delta;
-    this.hash_function = params.hash_function;
-    this.hash_table = new HashTable({ hash_function: this.hash_function });
   }
 
   public fit(params: { training_data: TrainingDataPoint[] }): void {
@@ -92,6 +95,8 @@ export class VRKNN {
       if (data_point.coordinates.length !== 2)
         throw new Error("Data points must have 2 coordinates");
     });
+
+    this.hash_table.create_buckets({ data: this.training_data });
 
     this.training_data.forEach((data_point) => {
       this.hash_table.insert({ data_point });
