@@ -1,8 +1,8 @@
-import { Dataset } from "./dataset";
 import iris_dataset from "./data/iris.json";
 import breast_cancer_dataset from "./data/breast_cancer.json";
 import dry_beans_dataset from "./data/dry_beans.json";
-import { KNN, VRKNN } from "./lib";
+import magic_gamma_dataset from "./data/magic_gamma.json";
+import { KNN, VRKNN, Dataset } from "./lib";
 
 // Iris Dataset
 
@@ -86,7 +86,7 @@ const [
   data: breast_cancer_data,
   training_entities: ["radius_mean", "texture_mean"],
   testing_entity: "diagnosis",
-  test_size: 0.2,
+  test_size: 0.1,
   random_state: 42,
 });
 
@@ -165,7 +165,7 @@ const [
   data: dry_beans_data,
   training_entities: ["Area", "Perimeter"],
   testing_entity: "Class",
-  test_size: 0.2,
+  test_size: 0.1,
   random_state: 42,
 });
 
@@ -188,7 +188,7 @@ const accuracy_knn_dry_beans = knn_dry_beans.evaluate({
 
 const vrknn_dry_beans = new VRKNN({
   k: 10,
-  radius_delta: 20,
+  radius_delta: 0.1,
 });
 
 vrknn_dry_beans.fit({
@@ -226,3 +226,93 @@ console.log(
   vrknn_dry_beans.time_taken_to_predict,
   "ms"
 );
+
+/* // MAGIC Gamma Telescope Dataset
+interface MagicGammaTelescopeDataPoint {
+  fLength: number;
+  fWidth: number;
+  class: string;
+}
+
+const magic_gamma_telescope_data: MagicGammaTelescopeDataPoint[] =
+  magic_gamma_dataset as MagicGammaTelescopeDataPoint[];
+
+const [
+  training_data_magic_gamma_telescope,
+  testing_data_magic_gamma_telescope,
+  testing_labels_magic_gamma_telescope,
+] = Dataset.train_test_split({
+  data: magic_gamma_telescope_data,
+  training_entities: ["fLength", "fWidth"],
+  testing_entity: "class",
+  test_size: 0.1,
+  random_state: 42,
+});
+
+const knn_magic_gamma_telescope = new KNN({
+  k: 3,
+});
+
+knn_magic_gamma_telescope.fit({
+  training_data: training_data_magic_gamma_telescope,
+});
+
+const predictions_magic_gamma_telescope = knn_magic_gamma_telescope.predict({
+  testing_data: testing_data_magic_gamma_telescope,
+});
+
+const accuracy_knn_magic_gamma_telescope = knn_magic_gamma_telescope.evaluate({
+  predictions: predictions_magic_gamma_telescope,
+  testing_labels: testing_labels_magic_gamma_telescope,
+});
+
+const vrknn_magic_gamma_telescope = new VRKNN({
+  k: 3,
+  radius_delta: 0.01,
+});
+
+vrknn_magic_gamma_telescope.fit({
+  training_data: training_data_magic_gamma_telescope,
+});
+
+const vr_predictions_magic_gamma_telescope =
+  vrknn_magic_gamma_telescope.predict({
+    testing_data: testing_data_magic_gamma_telescope,
+  });
+
+const accuracy_vrknn_magic_gamma_telescope =
+  vrknn_magic_gamma_telescope.evaluate({
+    predictions: vr_predictions_magic_gamma_telescope,
+    testing_labels: testing_labels_magic_gamma_telescope,
+  });
+
+console.log("\nMAGIC Gamma Telescope Dataset Predictions");
+console.log(
+  "Total MAGIC Gamma Telescope Dataset: ",
+  magic_gamma_telescope_data.length
+);
+console.log(
+  "Length of training data of MAGIC Gamma Telescope Dataset: ",
+  training_data_magic_gamma_telescope.length
+);
+
+console.log(
+  "Length of testing data of MAGIC Gamma Telescope Dataset: ",
+  testing_data_magic_gamma_telescope.length
+);
+
+console.log("Accuracy of KNN: ", accuracy_knn_magic_gamma_telescope);
+console.log(
+  "Time taken to predict KNN: ",
+  knn_magic_gamma_telescope.time_taken_to_predict,
+  "ms"
+);
+
+console.log("Accuracy of VRKNN: ", accuracy_vrknn_magic_gamma_telescope);
+
+console.log(
+  "Time taken to predict VRKNN: ",
+  vrknn_magic_gamma_telescope.time_taken_to_predict,
+  "ms"
+);
+ */

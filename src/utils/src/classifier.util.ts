@@ -12,7 +12,10 @@ export const distance = (params: {
   return Math.sqrt(sum);
 };
 
-export const best_of_all = (params: { labels: string[] }): string => {
+export const best_of_all = (params: {
+  labels: string[];
+  algorithm: string;
+}): string => {
   const { labels } = params;
   const label_counts: { [key: string]: number } = {};
   labels.forEach((label, index) => {

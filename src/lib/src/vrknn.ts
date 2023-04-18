@@ -30,10 +30,38 @@ class HashTable {
 
   private hash_function(data_point: TrainingDataPoint): number {
     var bucket_id: number = 0;
-    const filteredBuckets = this.buckets.filter(
-      (bucket) => bucket.id <= data_point.coordinates[0]
-    );
-    bucket_id = filteredBuckets[filteredBuckets.length - 1].id;
+    for (var i = 0; i < this.buckets.length; i++) {
+      if (this.buckets[i].id + this.bucket_size < data_point.coordinates[0]) {
+        if (i === this.buckets.length - 1) {
+          bucket_id = this.buckets[i].id;
+          break;
+        } else {
+          continue;
+        }
+      } else {
+        bucket_id = this.buckets[i].id;
+        break;
+      }
+    }
+    return bucket_id;
+  }
+
+  private get_bucket_id(data_point: TrainingDataPoint): number {
+    var bucket_id: number = 0;
+    if (data_point.coordinates[0] > this.buckets[this.buckets.length - 1].id) {
+      bucket_id = this.buckets[this.buckets.length - 1].id;
+    } else if (data_point.coordinates[0] < this.buckets[0].id) {
+      bucket_id = this.buckets[0].id;
+    } else {
+      for (var i = 0; i < this.buckets.length; i++) {
+        if (this.buckets[i].id + this.bucket_size < data_point.coordinates[0]) {
+          continue;
+        } else {
+          bucket_id = this.buckets[i].id;
+          break;
+        }
+      }
+    }
     return bucket_id;
   }
 
@@ -46,25 +74,41 @@ class HashTable {
   }
 
   public data_points_in_range(params: {
-    max_x: number;
     min_x: number;
+    max_x: number;
     min_y: number;
     max_y: number;
   }): TrainingDataPoint[] {
-    const { max_x, min_x, max_y, min_y } = params;
+    const { min_x, max_x, min_y, max_y } = params;
     const data_points_in_range: TrainingDataPoint[] = [];
-    this.buckets.forEach((bucket, index) => {
-      if (bucket.id >= min_x && bucket.id <= max_x) {
-        bucket.data.forEach((data_point) => {
-          if (
-            data_point.coordinates[1] >= min_y &&
-            data_point.coordinates[1] <= max_y
-          ) {
-            data_points_in_range.push(data_point);
-          }
-        });
+
+    const min_bucket_index = this.buckets.findIndex(
+      (bucket) =>
+        bucket.id === this.get_bucket_id({ coordinates: [min_x, 0], label: "" })
+    );
+
+    const max_bucket_index = this.buckets.findIndex(
+      (bucket) =>
+        bucket.id === this.get_bucket_id({ coordinates: [max_x, 0], label: "" })
+    );
+
+    for (let i = min_bucket_index; i <= max_bucket_index; i++) {
+      const bucket = this.buckets[i];
+      for (let j = 0; j < bucket.data.length; j++) {
+        const data_point = bucket.data[j];
+        if (
+          data_point.coordinates[1] >= min_y &&
+          data_point.coordinates[1] <= max_y
+        ) {
+          data_points_in_range.push(data_point);
+        } else if (data_point.coordinates[1] > max_y) {
+          break;
+        } else {
+          continue;
+        }
       }
-    });
+    }
+
     return data_points_in_range;
   }
 }
@@ -116,20 +160,27 @@ export class VRKNN {
     testing_data.forEach((test_datapoint) => {
       const nearest_neighbors: TrainingDataPoint[][] = [];
       const distances: [string, number][] = [];
+      var x_min = test_datapoint.coordinates[0];
+      var x_max = test_datapoint.coordinates[0];
+      var y_min = test_datapoint.coordinates[1];
+      var y_max = test_datapoint.coordinates[1];
+
       while (nearest_neighbors.length <= this.k) {
-        testing_data.forEach((test_datapoint) => {
-          var x_min = test_datapoint.coordinates[0] - this.radius_delta;
-          var x_max = test_datapoint.coordinates[0] + this.radius_delta;
-          var y_min = test_datapoint.coordinates[1] - this.radius_delta;
-          var y_max = test_datapoint.coordinates[1] + this.radius_delta;
-          var data_points_in_range = this.hash_table.data_points_in_range({
-            max_x: x_max,
-            min_x: x_min,
-            max_y: y_max,
-            min_y: y_min,
-          });
-          nearest_neighbors.push(data_points_in_range);
+        x_min -= this.radius_delta;
+        x_max += this.radius_delta;
+        y_min -= this.radius_delta;
+        y_max += this.radius_delta;
+
+        const data_points_in_range = this.hash_table.data_points_in_range({
+          max_x: x_max,
+          min_x: x_min,
+          max_y: y_max,
+          min_y: y_min,
         });
+        if (data_points_in_range.length === 0) {
+          continue;
+        }
+        nearest_neighbors.push(data_points_in_range);
       }
       nearest_neighbors.forEach((neighbors) => {
         neighbors.forEach((neighbor) => {
@@ -149,7 +200,7 @@ export class VRKNN {
       distances.sort((a, b) => a[1] - b[1]);
       const k_nearest_neighbors = distances.slice(0, this.k);
       const labels = k_nearest_neighbors.map((neighbor) => neighbor[0]);
-      predictions.push(best_of_all({ labels }));
+      predictions.push(best_of_all({ labels, algorithm: "VRKNN" }));
     });
 
     this.time_taken_to_predict = Date.now() - start_time;

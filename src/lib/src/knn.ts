@@ -38,7 +38,7 @@ export class KNN {
       const sorted_distances = distances.sort((a, b) => a[1] - b[1]);
       const k_nearest_neighbors = sorted_distances.slice(0, this.k);
       const labels = k_nearest_neighbors.map((neighbor) => neighbor[0]);
-      predictions.push(best_of_all({ labels }));
+      predictions.push(best_of_all({ labels, algorithm: "KNN" }));
     });
     this.time_taken_to_predict = Date.now() - start_time;
     return predictions;
