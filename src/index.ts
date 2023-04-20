@@ -25,9 +25,11 @@ const [training_data, testing_data, testing_labels] = Dataset.train_test_split({
   test_size: 0.2,
   random_state: 42,
 });
+const iris_k_value = 3;
+const radius_delta = 0.1;
 
 const knn = new KNN({
-  k: 3,
+  k: iris_k_value,
 });
 
 knn.fit({
@@ -44,8 +46,8 @@ const accuracy_knn = knn.evaluate({
 });
 
 const vrknn = new VRKNN({
-  k: 3,
-  radius_delta: 0.1,
+  k: iris_k_value,
+  radius_delta: radius_delta,
 });
 
 vrknn.fit({
@@ -64,10 +66,20 @@ const accuracy_vrknn = vrknn.evaluate({
 console.log("Total Iris Dataset: ", iris_data.length);
 console.log("Length of training data of Iris Dataset: ", training_data.length);
 console.log("Length of testing data of Iris Dataset: ", testing_data.length);
+console.log("K value of Iris Dataset: ", iris_k_value);
+console.log("Radius delta of Iris Dataset: ", radius_delta);
 console.log("Accuracy of KNN: ", accuracy_knn);
-console.log("Time taken to predict KNN: ", knn.time_taken_to_predict, "ms");
+console.log(
+  "Time taken to predict using KNN: ",
+  knn.time_taken_to_predict,
+  "ms"
+);
 console.log("Accuracy of VRKNN: ", accuracy_vrknn);
-console.log("Time taken to predict VRKNN: ", vrknn.time_taken_to_predict, "ms");
+console.log(
+  "Time taken to predict using VRKNN: ",
+  vrknn.time_taken_to_predict,
+  "ms"
+);
 
 // Breast Cancer Dataset
 interface BreastCancerDataPoint {
@@ -90,8 +102,11 @@ const [
   random_state: 42,
 });
 
+const breast_cancer_k_value = 3;
+const breast_cancer_radius_delta = 0.1;
+
 const knn_breast_cancer = new KNN({
-  k: 3,
+  k: breast_cancer_k_value,
 });
 
 knn_breast_cancer.fit({
@@ -108,8 +123,8 @@ const accuracy_knn_breast_cancer = knn_breast_cancer.evaluate({
 });
 
 const vrknn_breast_cancer = new VRKNN({
-  k: 3,
-  radius_delta: 0.1,
+  k: breast_cancer_k_value,
+  radius_delta: breast_cancer_radius_delta,
 });
 
 vrknn_breast_cancer.fit({
@@ -134,15 +149,20 @@ console.log(
   "Length of testing data of Breast Cancer Dataset:",
   testing_data_breast_cancer.length
 );
+console.log("K value of Breast Cancer Dataset: ", breast_cancer_k_value);
+console.log(
+  "Radius delta of Breast Cancer Dataset: ",
+  breast_cancer_radius_delta
+);
 console.log("Accuracy of KNN: ", accuracy_knn_breast_cancer);
 console.log(
-  "Time taken to predict KNN: ",
+  "Time taken to predict using KNN: ",
   knn_breast_cancer.time_taken_to_predict,
   "ms"
 );
 console.log("Accuracy of VRKNN: ", accuracy_vrknn_breast_cancer);
 console.log(
-  "Time taken to predict VRKNN: ",
+  "Time taken to predict using VRKNN: ",
   vrknn_breast_cancer.time_taken_to_predict,
   "ms"
 );
@@ -168,6 +188,9 @@ const [
   test_size: 0.1,
   random_state: 42,
 });
+
+const dry_beans_k_value = 10;
+const dry_beans_radius_delta = 0.1;
 
 const knn_dry_beans = new KNN({
   k: 10,
@@ -214,20 +237,22 @@ console.log(
   "Length of testing data of Dry Beans Dataset: ",
   testing_data_dry_beans.length
 );
+console.log("K value of Dry Beans Dataset: ", dry_beans_k_value);
+console.log("Radius delta of Dry Beans Dataset: ", dry_beans_radius_delta);
 console.log("Accuracy of KNN: ", accuracy_knn_dry_beans);
 console.log(
-  "Time taken to predict KNN: ",
+  "Time taken to predict using KNN: ",
   knn_dry_beans.time_taken_to_predict,
   "ms"
 );
 console.log("Accuracy of VRKNN: ", accuracy_vrknn_dry_beans);
 console.log(
-  "Time taken to predict VRKNN: ",
+  "Time taken to predict using VRKNN: ",
   vrknn_dry_beans.time_taken_to_predict,
   "ms"
 );
 
-/* // MAGIC Gamma Telescope Dataset
+// MAGIC Gamma Telescope Dataset
 interface MagicGammaTelescopeDataPoint {
   fLength: number;
   fWidth: number;
@@ -249,8 +274,11 @@ const [
   random_state: 42,
 });
 
+const magic_gamma_telescope_k_value = 10;
+const magic_gamma_telescope_radius_delta = 0.1;
+
 const knn_magic_gamma_telescope = new KNN({
-  k: 3,
+  k: magic_gamma_telescope_k_value,
 });
 
 knn_magic_gamma_telescope.fit({
@@ -267,8 +295,8 @@ const accuracy_knn_magic_gamma_telescope = knn_magic_gamma_telescope.evaluate({
 });
 
 const vrknn_magic_gamma_telescope = new VRKNN({
-  k: 3,
-  radius_delta: 0.01,
+  k: magic_gamma_telescope_k_value,
+  radius_delta: magic_gamma_telescope_radius_delta,
 });
 
 vrknn_magic_gamma_telescope.fit({
@@ -301,9 +329,19 @@ console.log(
   testing_data_magic_gamma_telescope.length
 );
 
+console.log(
+  "K value of MAGIC Gamma Telescope Dataset: ",
+  magic_gamma_telescope_k_value
+);
+
+console.log(
+  "Radius delta of MAGIC Gamma Telescope Dataset: ",
+  magic_gamma_telescope_radius_delta
+);
+
 console.log("Accuracy of KNN: ", accuracy_knn_magic_gamma_telescope);
 console.log(
-  "Time taken to predict KNN: ",
+  "Time taken to predict using KNN: ",
   knn_magic_gamma_telescope.time_taken_to_predict,
   "ms"
 );
@@ -311,8 +349,7 @@ console.log(
 console.log("Accuracy of VRKNN: ", accuracy_vrknn_magic_gamma_telescope);
 
 console.log(
-  "Time taken to predict VRKNN: ",
+  "Time taken to predict using VRKNN: ",
   vrknn_magic_gamma_telescope.time_taken_to_predict,
   "ms"
 );
- */

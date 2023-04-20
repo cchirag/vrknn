@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node dist/index.js"
+    "start": "tsc && node dist/index.js",
+    "predict:iris": "tsc && node dist/iris.js",
+    "predict:cancer": "tsc && node dist/cancer.js",
+    "predict:beans": "tsc && node dist/beans.js",
+    "predict:gamma": "tsc && node dist/gamma.js"
   },
   "keywords": [],
   "author": "",
