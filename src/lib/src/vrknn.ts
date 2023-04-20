@@ -158,7 +158,7 @@ export class VRKNN {
     const start_time = Date.now();
 
     testing_data.forEach((test_datapoint) => {
-      const nearest_neighbors: TrainingDataPoint[][] = [];
+      const nearest_neighbors: TrainingDataPoint[] = [];
       const distances: [string, number][] = [];
       var x_min = test_datapoint.coordinates[0];
       var x_max = test_datapoint.coordinates[0];
@@ -180,21 +180,23 @@ export class VRKNN {
         if (data_points_in_range.length === 0) {
           continue;
         }
-        nearest_neighbors.push(data_points_in_range);
-      }
-      nearest_neighbors.forEach((neighbors) => {
-        neighbors.forEach((neighbor) => {
-          distances.push([
-            neighbor.label,
-            distance({
-              point1: [neighbor.coordinates[0], neighbor.coordinates[1]],
-              point2: [
-                test_datapoint.coordinates[0],
-                test_datapoint.coordinates[1],
-              ],
-            }),
-          ]);
+        data_points_in_range.forEach((data_point) => {
+          if (!nearest_neighbors.includes(data_point)) {
+            nearest_neighbors.push(data_point);
+          }
         });
+      }
+      nearest_neighbors.forEach((neighbor) => {
+        distances.push([
+          neighbor.label,
+          distance({
+            point1: [neighbor.coordinates[0], neighbor.coordinates[1]],
+            point2: [
+              test_datapoint.coordinates[0],
+              test_datapoint.coordinates[1],
+            ],
+          }),
+        ]);
       });
 
       distances.sort((a, b) => a[1] - b[1]);
